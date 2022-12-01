@@ -27,6 +27,9 @@ pub enum IpldCodec {
     /// Protobuf codec.
     #[cfg(feature = "dag-pb")]
     DagPb,
+    /// Git Codec
+    #[cfg(feature = "dag-git")]
+    DagGit,
 }
 
 impl TryFrom<u64> for IpldCodec {
@@ -41,6 +44,8 @@ impl TryFrom<u64> for IpldCodec {
             0x0129 => Self::DagJson,
             #[cfg(feature = "dag-pb")]
             0x70 => Self::DagPb,
+            #[cfg(feature = "dag-git")]
+            0x78 => Self::DagGit,
             _ => return Err(UnsupportedCodec(ccode)),
         })
     }
@@ -56,6 +61,8 @@ impl From<IpldCodec> for u64 {
             IpldCodec::DagJson => 0x0129,
             #[cfg(feature = "dag-pb")]
             IpldCodec::DagPb => 0x70,
+            #[cfg(feature = "dag-git")]
+            IpldCodec::DagGit=>0x78,
         }
     }
 }
@@ -120,6 +127,8 @@ impl Encode<IpldCodec> for Ipld {
             IpldCodec::DagJson => self.encode(DagJsonCodec, w)?,
             #[cfg(feature = "dag-pb")]
             IpldCodec::DagPb => self.encode(DagPbCodec, w)?,
+            #[cfg(feature = "dag-git")]
+            IpldCodec::DagGit => self.encode(DagGitCodec, w)?,
         };
         Ok(())
     }
@@ -135,6 +144,8 @@ impl Decode<IpldCodec> for Ipld {
             IpldCodec::DagJson => Self::decode(DagJsonCodec, r)?,
             #[cfg(feature = "dag-pb")]
             IpldCodec::DagPb => Self::decode(DagPbCodec, r)?,
+            #[cfg(feature = "dag-git")]
+            IpldCodec::DagGit => Self::decode(DagGitCodec, r)?,
         })
     }
 }
@@ -156,7 +167,9 @@ impl References<IpldCodec> for Ipld {
                 <Self as References<DagJsonCodec>>::references(DagJsonCodec, r, set)?
             }
             #[cfg(feature = "dag-pb")]
-            IpldCodec::DagPb => <Self as References<DagPbCodec>>::references(DagPbCodec, r, set)?,
+            IpldCodec::DagPb => <Self as References<DagGitCodec>>::references(DagGitCodec, r, set)?,
+            #[cfg(feature = "dag-git")]
+            IpldCodec::DagGit => <Self as References<DagGitCodec>>::references(DagGitCodec, r, set)?,
         };
         Ok(())
     }

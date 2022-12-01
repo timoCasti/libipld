@@ -36,6 +36,7 @@ default = ["dag-cbor", "dag-json", "dag-pb", "derive"]
 dag-cbor = ["libipld-cbor"]
 dag-json = ["libipld-json"]
 dag-pb = ["libipld-pb"]
+dag-git = ["libipld-git"]
 derive = ["libipld-cbor-derive"]
 serde-codec = ["libipld-core/serde-codec"]
 
@@ -48,6 +49,7 @@ members = [
   "dag-pb",
   "macro",
   "dag-cbor-derive/examples/renamed-package",
+  "dag-git"
 ]
 
 [profile.release]
