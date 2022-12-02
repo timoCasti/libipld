@@ -18,6 +18,8 @@ pub use libipld_json as json;
 pub use libipld_macro::*;
 #[cfg(feature = "dag-pb")]
 pub use libipld_pb as pb;
+#[cfg(feature = "dag-git")]
+pub use libipld_git as git;
 
 pub use block::Block;
 pub use cid::Cid;

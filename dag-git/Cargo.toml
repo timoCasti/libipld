@@ -8,10 +8,11 @@ description = "ipld protobuf codec"
 repository = "https://github.com/ipfs-rust/rust-ipld"
 
 [dependencies]
+anyhow = { version = "1.0.40", default-features = false }
 libipld-core = { version = "0.15.0", path = "../core" }
 prost = "0.11.0"
 thiserror = "1.0.25"
 
 [dev-dependencies]
 libipld-macro = { path = "../macro" }
-multihash = {version="0.17.0", features = ["std", "multihash-impl", "sha1"]}
+multihash = { ssh = "ssh://git@gitlab.com:ColombaLink/dev/dapsi/public/dybli/core/deps/multihash.git"}

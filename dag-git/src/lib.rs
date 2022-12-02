@@ -1,27 +1,24 @@
 //! Implements the raw codec.
-use alloc::{boxed::Box, vec, vec::Vec};
-use core::{convert::TryFrom, iter::Extend};
 
-use crate::cid::Cid;
-use crate::codec::{Codec, Decode, Encode, References};
-use crate::error::{Result, UnsupportedCodec};
-use crate::io::{Read, Seek, Write};
-use crate::ipld::Ipld;
+use core::{convert::TryFrom, iter::Extend};
+use libipld_core::cid::Cid;
+use libipld_core::codec::{Codec, Decode, Encode, References};
+use libipld_core::error::{Result, UnsupportedCodec};
+use std::io::{Read, Seek, Write};
+use libipld_core::ipld::Ipld;
 
 
 mod codec;
-mod dag_git;
 
-
-/// Raw codec.
+/// Git codec.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GitCodec;
 
-impl Codec for GitCoded {}
+impl Codec for GitCodec {}
 
-/*
+
 impl From<GitCodec> for u64 {
-    fn from(_: GitCoded) -> Self {
+    fn from(_: GitCodec) -> Self {
         0x78
     }
 }
@@ -34,19 +31,23 @@ impl TryFrom<u64> for GitCodec {
     }
 }
 
- */
+
+
 
 impl Encode<GitCodec> for [u8] {
     fn encode<W: Write>(&self, _: GitCodec, w: &mut W) -> Result<()> {
         w.write_all(self).map_err(anyhow::Error::msg)
     }
 }
+/*
 
 impl Encode<GitCodec> for Box<[u8]> {
     fn encode<W: Write>(&self, _: GitCodec, w: &mut W) -> Result<()> {
         w.write_all(&self[..]).map_err(anyhow::Error::msg)
     }
 }
+*/
+
 
 impl Encode<GitCodec> for Vec<u8> {
     fn encode<W: Write>(&self, _: GitCodec, w: &mut W) -> Result<()> {
@@ -59,13 +60,14 @@ impl Encode<GitCodec> for Ipld {
         if let Ipld::Bytes(bytes) = self {
             bytes.encode(c, w)
         } else {
-            Err(anyhow::Error::msg(crate::error::TypeError::new(
-                crate::error::TypeErrorType::Bytes,
+            Err(anyhow::Error::msg(libipld_core::error::TypeError::new(
+                libipld_core::error::TypeErrorType::Bytes,
                 self,
             )))
         }
     }
 }
+/*
 
 impl Decode<GitCodec> for Box<[u8]> {
     fn decode<R: Read + Seek>(c: GitCodec, r: &mut R) -> Result<Self> {
@@ -73,6 +75,7 @@ impl Decode<GitCodec> for Box<[u8]> {
         Ok(buf.into_boxed_slice())
     }
 }
+*/
 
 impl Decode<GitCodec> for Vec<u8> {
     fn decode<R: Read + Seek>(_: GitCodec, r: &mut R) -> Result<Self> {
@@ -89,14 +92,18 @@ impl Decode<GitCodec> for Ipld {
     }
 }
 
-impl<T> References<GitCodec> for T {
+
+impl References<GitCodec> for Ipld {
     fn references<R: Read, E: Extend<Cid>>(_c: GitCodec, _r: &mut R, _set: &mut E) -> Result<()> {
         Ok(())
     }
 }
 
+
+
 #[cfg(test)]
 mod tests {
+    use libipld_core::ipld::Ipld;
     use super::*;
 
     #[test]
@@ -106,11 +113,13 @@ mod tests {
         assert_eq!(data, &*bytes);
         let data2: Vec<u8> = GitCodec.decode(&bytes).unwrap();
         assert_eq!(data, &*data2);
-
+/*
         let ipld = Ipld::Bytes(data2);
         let bytes = GitCodec.encode(&ipld).unwrap();
         assert_eq!(data, &*bytes);
         let ipld2: Ipld = GitCodec.decode(&bytes).unwrap();
         assert_eq!(ipld, ipld2);
+
+ */
     }
 }

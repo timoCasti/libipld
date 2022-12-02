@@ -9,6 +9,8 @@ use crate::ipld::Ipld;
 use crate::json::DagJsonCodec;
 #[cfg(feature = "dag-pb")]
 use crate::pb::DagPbCodec;
+#[cfg(feature = "dag-git")]
+use crate::git::GitCodec;
 use crate::raw::RawCodec;
 use core::convert::TryFrom;
 use std::io::{Read, Seek, Write};
@@ -115,6 +117,13 @@ impl From<IpldCodec> for DagPbCodec {
     }
 }
 
+#[cfg(feature = "dag-git")]
+impl From<IpldCodec> for GitCodec {
+    fn from(_: IpldCodec) -> Self {
+        Self
+    }
+}
+
 impl Codec for IpldCodec {}
 
 impl Encode<IpldCodec> for Ipld {
@@ -128,7 +137,7 @@ impl Encode<IpldCodec> for Ipld {
             #[cfg(feature = "dag-pb")]
             IpldCodec::DagPb => self.encode(DagPbCodec, w)?,
             #[cfg(feature = "dag-git")]
-            IpldCodec::DagGit => self.encode(DagGitCodec, w)?,
+            IpldCodec::DagGit => self.encode(GitCodec, w)?,
         };
         Ok(())
     }
@@ -145,7 +154,7 @@ impl Decode<IpldCodec> for Ipld {
             #[cfg(feature = "dag-pb")]
             IpldCodec::DagPb => Self::decode(DagPbCodec, r)?,
             #[cfg(feature = "dag-git")]
-            IpldCodec::DagGit => Self::decode(DagGitCodec, r)?,
+            IpldCodec::DagGit => Self::decode(GitCodec, r)?,
         })
     }
 }
@@ -167,9 +176,10 @@ impl References<IpldCodec> for Ipld {
                 <Self as References<DagJsonCodec>>::references(DagJsonCodec, r, set)?
             }
             #[cfg(feature = "dag-pb")]
-            IpldCodec::DagPb => <Self as References<DagGitCodec>>::references(DagGitCodec, r, set)?,
+            IpldCodec::DagPb => <Self as References<DagPbCodec>>::references(DagPbCodec, r, set)?,
+
             #[cfg(feature = "dag-git")]
-            IpldCodec::DagGit => <Self as References<DagGitCodec>>::references(DagGitCodec, r, set)?,
+            IpldCodec::DagGit => <Self as References<GitCodec>>::references(GitCodec, r, set)?,
         };
         Ok(())
     }
@@ -249,4 +259,22 @@ mod tests {
         let result: Ipld = IpldCodec::DagPb.decode(&data).unwrap();
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn git_encode() {
+        let data = Ipld::Bytes([0x22, 0x33, 0x44].to_vec());
+        let result = IpldCodec::DagGit.encode(&data).unwrap();
+        assert_eq!(result, vec![0x22, 0x33, 0x44]);
+    }
+
+    #[cfg(feature = "dag-git")]
+    #[test]
+    fn git_decode() {
+        let data = [0x22, 0x33, 0x44];
+        let result: Ipld = IpldCodec::DagGit.decode(&data).unwrap();
+        assert_eq!(result, Ipld::Bytes(data.to_vec()));
+    }
+
+
+
 }
