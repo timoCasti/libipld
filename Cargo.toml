@@ -13,6 +13,7 @@ consolidate-pushes = true
 shared-version = true
 
 [dependencies]
+async-trait = "0.1.50"
 fnv = "1.0.7"
 libipld-cbor = { version = "0.15.0", path = "dag-cbor", optional = true }
 libipld-cbor-derive = { version = "0.15.0", path = "dag-cbor-derive", optional = true }
