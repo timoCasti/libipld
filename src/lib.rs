@@ -27,6 +27,6 @@ pub use codec_impl::IpldCodec;
 pub use error::Result;
 pub use ipld::Ipld;
 pub use link::Link;
-pub use multihash::Multihash;
+pub use crate::multihash::Multihash;
 pub use path::{DagPath, Path};
 pub use store::DefaultParams;
